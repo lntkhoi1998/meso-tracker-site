@@ -397,13 +397,16 @@ window.addEventListener('DOMContentLoaded',()=>{
 // ── DATA ─────────────────────────────────────────────────────
 async function loadData(){
   try{
-    const manifest=await loadFileById('manifest.json');
-    if(manifest){
-      const papers=manifest.papers_file_id?await loadFileById(manifest.papers_file_id):null;
-      const people=manifest.people_file_id?await loadFileById(manifest.people_file_id):null;
-      if(papers)state.papers=papers;
-      if(people)state.people=people;
-      if(papers||people){finishLoad();return}
+    const manifest = await loadFileById('13jlBcwNh-Xty4R9nCclmRwPNUUtSKaJC');
+if(manifest){
+  const papers = manifest.files?.papers_json?.gdrive_id
+    ? await loadFileById(manifest.files.papers_json.gdrive_id) : null;
+  const people = manifest.files?.people_json?.gdrive_id
+    ? await loadFileById(manifest.files.people_json.gdrive_id) : null;
+  if(papers) state.papers = papers;
+  if(people)  state.people = people;
+  if(papers || people){ finishLoad(); return }
+}
     }
   }catch(e){}
   loadSampleData();
