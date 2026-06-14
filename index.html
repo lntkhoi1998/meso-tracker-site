@@ -394,20 +394,20 @@ window.addEventListener('DOMContentLoaded',()=>{
 // ── DATA ─────────────────────────────────────────────────────
 async function loadData(){
   try{
-    const manifest=await loadFileById('manifest.json');
+    const manifest=await loadFileById('13jlBcwNh-Xty4R9nCclmRwPNUUtSKaJC');
     if(manifest){
-      const papers=manifest.papers_file_id?await loadFileById(manifest.papers_file_id):null;
-      const people=manifest.people_file_id?await loadFileById(manifest.people_file_id):null;
+      const papers=manifest.files?.papers_json?.gdrive_id?await loadFileById(manifest.files.papers_json.gdrive_id):null;
+      const people=manifest.files?.people_json?.gdrive_id?await loadFileById(manifest.files.people_json.gdrive_id):null;
       if(papers)state.papers=papers;
       if(people)state.people=people;
       if(papers||people){finishLoad();return}
     }
-  }catch(e){}
+  }catch(e){console.error('Drive load failed:',e)}
   loadSampleData();
   finishLoad();
 }
 async function loadFileById(fileId){
-  const url=`https://drive.google.com/uc?export=download&id=${fileId}`;
+  const url=`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=AIzaSyBYourActualKeyHere`;
   try{const r=await fetch(url);if(!r.ok)return null;return await r.json()}catch{return null}
 }
 
