@@ -363,7 +363,7 @@ button{font-family:inherit;cursor:pointer}
 </div>
 
 <script>
-const DRIVE_FOLDER_ID='1Zru4o_r3wTqeEu55yK88F40b85Q5YlEy';
+const GITHUB_RAW='https://raw.githubusercontent.com/lntkhoi1998/meso-tracker-collector/main';
 
 let state={papers:[],people:[],view:'material',filter:'all',search:'',currentPersonId:null,notes:{}};
 
@@ -394,20 +394,18 @@ window.addEventListener('DOMContentLoaded',()=>{
 // ── DATA ─────────────────────────────────────────────────────
 async function loadData(){
   try{
-    const manifest=await loadFileById('13jlBcwNh-Xty4R9nCclmRwPNUUtSKaJC');
-    if(manifest){
-      const papers=manifest.files?.papers_json?.gdrive_id?await loadFileById(manifest.files.papers_json.gdrive_id):null;
-      const people=manifest.files?.people_json?.gdrive_id?await loadFileById(manifest.files.people_json.gdrive_id):null;
-      if(papers)state.papers=papers;
-      if(people)state.people=people;
-      if(papers||people){finishLoad();return}
-    }
-  }catch(e){console.error('Drive load failed:',e)}
+    const[papers,people]=await Promise.all([
+      fetchJson(`${GITHUB_RAW}/metadata/papers.json`),
+      fetchJson(`${GITHUB_RAW}/metadata/people.json`),
+    ]);
+    if(papers)state.papers=papers;
+    if(people)state.people=people;
+    if(papers||people){finishLoad();return}
+  }catch(e){console.error('GitHub load failed:',e)}
   loadSampleData();
   finishLoad();
 }
-async function loadFileById(fileId){
-  const url=`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=AIzaSyD_S3cDpWb15TsTnfAeDLvBq60xPRk8wHE`;
+async function fetchJson(url){
   try{const r=await fetch(url);if(!r.ok)return null;return await r.json()}catch{return null}
 }
 
@@ -895,7 +893,10 @@ function closeProfile(){
 // ── UTILS ─────────────────────────────────────────────────────
 function toggleNotes(id){const el=document.getElementById('notes-'+id);if(el)el.classList.toggle('open')}
 function saveNote(key,text){state.notes[key]={text,ts:Date.now()};localStorage.setItem('meso_notes',JSON.stringify(state.notes))}
-function openPdf(arxivId){window.open(`https://arxiv.org/pdf/${arxivId}.pdf`,'_blank')}
+function openPdf(arxivId,pdfPath){
+  const url=pdfPath?`${GITHUB_RAW}/${pdfPath}`:`https://arxiv.org/pdf/${arxivId}.pdf`;
+  window.open(url,'_blank');
+}
 function esc(str){if(!str)return'';return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 function fmtDate(iso){if(!iso)return'';try{return new Date(iso).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})}catch{return iso.slice(0,10)}}
 function emptyHTML(){return`<div class="empty-state"><div class="icon">◎</div><div class="msg">No papers match your current filter</div><div class="sub">Try changing the filter or clearing the search.</div></div>`}
