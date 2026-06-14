@@ -412,7 +412,7 @@ async function loadData(){
   finishLoad();
 }
 async function loadFileById(fileId){
-  const url=`https://drive.google.com/uc?export=download&id=${fileId}`;
+  const url=`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=AIzaSyD_S3cDpWb15TsTnfAeDLvBq60xPRk8wHE`;
   try{const r=await fetch(url);if(!r.ok)return null;return await r.json()}catch{return null}
 }
 
