@@ -6,7 +6,7 @@
 <title>2D Mesoscopic Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600&family=Georgia:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -83,10 +83,10 @@ button{font-family:inherit;cursor:pointer}
 .panel-header{padding:16px 24px 12px;border-bottom:1px solid var(--border);background:var(--navy);display:flex;align-items:baseline;gap:12px;flex-shrink:0}
 .panel-title{font-size:15px;font-weight:600;color:var(--paper)}
 .panel-count{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--teal)}
-.panel-content{padding:16px 24px}
+.panel-content{padding:16px 24px;max-width:900px}
 
 /* ── PAPER CARD ─────────────────────────────────────── */
-.paper-card{border:1px solid var(--border);background:var(--navy2);margin-bottom:12px;padding:16px 18px;transition:border-color .15s}
+.paper-card{border:0.5px solid var(--border);background:var(--navy2);margin-bottom:12px;padding:16px 18px;transition:border-color .15s;border-radius:6px}
 .paper-card:hover{border-color:var(--border2)}
 .paper-card.flagged{border-color:rgba(232,95,95,.35)}
 .paper-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
@@ -110,11 +110,9 @@ button{font-family:inherit;cursor:pointer}
   font-size:13px;line-height:1.65;margin-bottom:6px;
   border-left:2px solid var(--teal2);
   padding-left:10px;
-  position:relative;
 }
 .summary-context-seg .ctx-text{
-  font-family:'Georgia',serif;font-style:italic;
-  color:var(--slate);
+  color:var(--text3);
 }
 .ctx-chip{
   font-family:'IBM Plex Mono',monospace;
@@ -125,8 +123,7 @@ button{font-family:inherit;cursor:pointer}
   vertical-align:middle;white-space:nowrap;
 }
 .significance-block-card{
-  font-family:'Georgia',serif;font-style:italic;
-  font-size:12px;color:var(--slate);line-height:1.65;
+  font-size:13px;color:var(--text3);line-height:1.65;
   border-left:2px solid rgba(155,127,232,.5);
   padding-left:10px;margin-bottom:14px;
 }
@@ -397,22 +394,20 @@ window.addEventListener('DOMContentLoaded',()=>{
 // ── DATA ─────────────────────────────────────────────────────
 async function loadData(){
   try{
-    const manifest=await loadFileById('13jlBcwNh-Xty4R9nCclmRwPNUUtSKaJC');
+    const manifest=await loadFileById('manifest.json');
     if(manifest){
-      const papers=manifest.files?.papers_json?.gdrive_id
-        ?await loadFileById(manifest.files.papers_json.gdrive_id):null;
-      const people=manifest.files?.people_json?.gdrive_id
-        ?await loadFileById(manifest.files.people_json.gdrive_id):null;
+      const papers=manifest.papers_file_id?await loadFileById(manifest.papers_file_id):null;
+      const people=manifest.people_file_id?await loadFileById(manifest.people_file_id):null;
       if(papers)state.papers=papers;
       if(people)state.people=people;
       if(papers||people){finishLoad();return}
     }
-  }catch(e){console.error('Drive load failed:',e)}
+  }catch(e){}
   loadSampleData();
   finishLoad();
 }
 async function loadFileById(fileId){
-  const url=`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=AIzaSyD_S3cDpWb15TsTnfAeDLvBq60xPRk8wHE`;
+  const url=`https://drive.google.com/uc?export=download&id=${fileId}`;
   try{const r=await fetch(url);if(!r.ok)return null;return await r.json()}catch{return null}
 }
 
